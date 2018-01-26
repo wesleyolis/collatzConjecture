@@ -1,0 +1,100 @@
+If we analize the domain of the problem using the collatz sequence definition the following insights come to light.
+	n -> n/2, if n is even, is a formula the will always result in reduction or convergance of the problem to 1.
+	n -> 3n +1, if n is ode, is a formula that results in growth and divergance.
+
+	The reduction formula, if mathermatically analyzed can be broken into the following cases for insight into the problem.
+	The first two case deal with even number reduction formula and the last is the ode number which results in growth or unkown number
+	seqeuence increases.
+	1.1 Any iteration that lands on a whole even integer, in the following sequence will always result in the 
+	collatz seqeuence rapidly convering to 1, when Iterated. n-> 2*n => 2,4,8,16,32,64,128....
+	It can also be noticed that this closely match binary system, were a number  would take k iteration to be reduced.
+	n = 2^k. 
+
+		Can one use this in improving the performance, by checking if the value is one of these special values, in 
+		which case we no longer need to run the iteration process?
+	
+		Well unless their is a special machien instruction for the chip set that could determine in less 2 clocks that their is only
+		a single bit set to 1 or high in the register, we could n't be able to gain much of performance gain.
+		If their was such a instruction and register, we could determine it belonged to the binary convergance sequence then
+		processed with bit shifting or mabye making use of another instruction that could convert bit that is set to a byte number
+		the represents the bit position, hence the number iteration to reduce.
+		One could look at prepopulating dictionary or an pre initialized binary search tree, but that would all take look up time
+		and require the process to map the constiguious block of memory into full associative array for 64 differnt values, it would take
+		the tree structure, which could be represented by a flat array struct currValue = position m, left tree = m+1. right node = m+2.
+		O(log(n)) time, however, their is allow the overhead of and branching of implementing this which just addeds to the complexity.
+		So genraly would just be faster run the iteration reduction. One could pull the Assembly language instruction clck cycle to be sure.
+
+		So clearly their is no point in attempting to speed up the convegance by caching any anwsers.
+
+	1.2 The same sequence also existings for a pattern that runs in base 10, which starts at 10 and progressing like such 10, 20, 40, 80, 160.
+		This sequence is then followed by a single growth and convergances of collatz 10 -> 5 -> 16 -> 8 -> 4 -> 2 -> 1.
+
+	2. Any iteration that lands on a whole even integer, that doesn't satistify the convergancy formula above in one, has the following charateristics.
+		The whole even integer when apply the collatz formula will result in another even number, which again iteratively be reduced until it
+		becomes and ode number. 28 -> 14 -> 7 or 10 -> 5
+
+	3. Any iteration that lands on an ode number will results in growth, followed by an imdediate reduction and unkown amount collatz sequence iterations.
+	   
+	Other insights into this problem:
+	The reduction formula, creates a one to many relationship between two numbers.
+	The growth formular is linear y = mx + c which means their can only 1-1 relationship formed between and ode and even number.
+
+	Overall this means that the common sequence runs in the collatz problem start their reductions
+
+	How can we look at speeding up the program execution in this problem, with some caching or using some of these insights above, versus a brute force approach.
+	
+	1. Like most string problems, were one is to get maxium substring of pattern and constraint, it is best to seed the iteration
+		with the largest possible number in this case the upperLimit. If an iteration goes beyond this value, iteration will be terminated
+		and no longer consider for the longest collatz squence found under and upper limit threash hold.
+		
+		The problem and question to ask is when do we stop the iteration, knowing that for any of the lower possible stating values it will be mathermatically or set theory impossible
+		for the collatz seqeuence to be longer. The question is how do, I determine this I don't know I need to think about this.
+
+	2. Using some form of cache or lookups which would require more memory, to speed things up by not repeating the sequence of the chain again.
+	2.1 When one looks at this problem, it doesn't have a predicatable pattern and one would have to keep a record of the chain iteration sequences, however,
+		one will ever know onto which value a existing seqeuence will reduce onto, their is the memory requirement as well as the lookup requirement and the fact that for each
+		value on would need to restore sequence length to speed up computation. So looking at the overall process one would have to look up the current value being iterated against
+		some form of tree structure in which their is no inherient pattern seen for these sequence, which means one would have to iterate the whole tree.
+		Clearly anything in the form of a lookup to find if it matches and existing sequence if found to use its anwser, will require iterating everything that exist in cache already,
+		which means might as well just do the computation until it convegers.
+
+	3. The other simple thing is to reduce the set of potential possible collatz values to be tested to see if they would form the longest chain below the upper limit.
+		This is a technique I have attempt to use for prime numbers, reduce the set size that a possible prime number needs to be tested against.
+		
+		For prime numbers one exploits set theory in which the first set of prime numbers (divisors) below 30 excluding 1*,2,3,5 as the nateral mutiples for the potential divisors.
+		One will compute the numbers for testing by taking 30 + one of these divisor, then typically to reduce the set by a single mutiple, one can remove prime number 7 from the divisor set
+		by explaning the set by mutiple of lower prime in the divisor set so. 30 * 7 = 210 is the new base number + previous divisor set  with 7 excluded. Unfortunately the rate of reduction is 
+		almost negligable.
+
+		For the collatz problem the best approached would be to record all the numbers that have been visted, in the sequence and then avoid
+		re-evaluting any number that was part of an existing sequence as it will just be a smaller subset of the larger initial collatz starting number.
+		This could be done very efficent by creating a bit map, were each bit would represent a numeber than has been visted.
+		The first approach could be that the bitmap be just massive malloc contigious block of memory.
+		The second more conservative approach would be have paged of buffered memory block, that would grow and then shift the lower bounds as
+		contigious section had all been evalued, typically like garbage collection. However, you will no be trading off incremental garbage collection
+		with using less memory, but at the end of the day, you can't have a realtime application crash if you run out of memory. So to be safe it would be best
+		to just ensure their is enough memory to handle the peak of every little task that could potentially run at the same time than
+		to have other section of real time application contest for memory resulting in those really time task being block, causing modeling and response problems.
+
+		Typically write a Bitmap class that can be iterated and not convertored to a vector at some point in the application, because that would be called uncompressing and would result
+		using more memory the compressed structure crashing the application.
+
+	3.2 One could revist the requirement in 1. For the seeding of the problem and make use of this bitmap to keep a statistic counter, that no chain could be longer than the remaining evaluations.
+		That doesn't mean that remaing evaluation couldn't merge with an existing chaing. This can be done much is a multi part formula that needs to be carefully thought through.
+
+	4. An alternative approach which wouldn't require the massive memory over head of a bitmap to speed things up, would be an attempt to invert the collatz logic,
+		 by this, I mean starting at one and running all the possibly permuations in reverse starting at 1.
+		 This approach would also support multi threading or task based excution were the problem branches for steps 2/3.
+
+		 1. So if the number is ode double it.
+		 2. If the number is even, then double it is the one case and the other would be
+		 3. Apply the reduction formular, which inverse is n = (n - 1) / 3, if in range.
+
+		 Improvements to performance can be made here, as all iterations of double can quickly be evaluted to the upper_limit by
+		 taking the upper_limit divided by the number to be doubled and then square route which should give the number of iterations.
+		 However, this would n't deal with applying the inverse reduction formula which has to still be applied to every value along the way,
+		 never the less it can still be used to determine the highest value from which to start iterating down and evalutating the reduction inverse formula.
+		 But this would potentially results in the iterations being biased to find the larger collatz sequencies first, if the results were to update in real time as they came in.
+		 
+		 But to ensure we have got the largest we have still brute force and evaluate all permuations, unless the 3.2 can be quantified.
+
