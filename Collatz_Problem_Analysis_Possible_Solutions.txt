@@ -1,3 +1,12 @@
+I have 3 main different solutoins with 2 variants each of optermizations for performances, some that use prime logic, if i recall to optermiz things, many algorithms I worked on during a period of a year. Included optermized prime computation algorithm, intergreated with animacial numbers and things like that to still levels, to reduce computations, because patterns with numbers. Kept private for good reasons.
+- CollatzBruteForceLinux
+- CollatzReductionBrutForce
+- CollatzReductionBrutForceInverse
+- CollatzReductionBrutForceInverseReciprical
+- CollatzReductionBrutForceSkipMap
+- CollatzReductionBrutForceSkipMapCache
+- CollatzReductionBrutForceWithBitMap
+
 If we analize the domain of the problem using the collatz sequence definition the following insights come to light.
 	n -> n/2, if n is even, is a formula the will always result in reduction or convergance of the problem to 1.
 	n -> 3n +1, if n is ode, is a formula that results in growth and divergance.
